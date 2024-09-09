@@ -128,7 +128,7 @@ SynthDef(\seventhSynth, {
 )
 
 (
-SynthDef(\seventhSynth, {
+SynthDef(\eightSynth, {
 	var fas = 1;
 
 	var pwm = SinOsc.ar(1, fas);//.range(0.5, 1);
@@ -142,6 +142,25 @@ SynthDef(\seventhSynth, {
 }
 ).play;
 )
+
+(
+SynthDef(\nineSynth, {
+	var fas = 0.5;
+	var v = 440;
+	var u = 660;
+
+	var sin1 = SinOsc.ar(u-v, fas);
+	var sin2 = SinOsc.ar(u+v, fas);
+
+	var output = 0.5*(sin1-sin2);
+
+	FreqScope(400, 200, 0, server: s);
+
+	Out.ar(0, {output}!2);
+}
+).play;
+)
+
 
 
 
