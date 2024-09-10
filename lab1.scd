@@ -6,7 +6,7 @@ s.boot;
 SynthDef(\firstSynth, {
 	var fas = 0.5;
 
-	var output = SinOsc.ar(100, fas);
+	var output = SinOsc.ar(440, fas);
 
 	FreqScope(400, 200, 0, server: s);
 
@@ -147,7 +147,7 @@ SynthDef(\eightSynth, {
 SynthDef(\nineSynth, {
 	var fas = 0.5;
 	var v = 440;
-	var u = 660;
+	var u = 880;
 
 	var sin1 = SinOsc.ar(u-v, fas);
 	var sin2 = SinOsc.ar(u+v, fas);
@@ -160,6 +160,73 @@ SynthDef(\nineSynth, {
 }
 ).play;
 )
+
+(
+SynthDef(\tenSynth, {
+	var fas = 1;
+	var v = 329.63;
+	var u = 880;
+
+	var sin1 = SinOsc.ar(v, fas).range(0, 1);
+
+	var sin2 = SinOsc.ar(u*sin1, fas);
+
+	var output = sin2.scope;
+
+	FreqScope(400, 200, 0, server: s);
+
+
+	Out.ar(0, {output}!2);
+}
+).play;
+)
+
+(
+SynthDef(\elevenSynth, {
+	var fas = 1;
+
+	var sin1 = SinOsc.ar(440).clip(-0.5, 0.5);
+
+	var sin2 = SinOsc.ar(440).softclip;
+
+	var output = sin1;
+
+	FreqScope(400, 200, 0, server: s);
+
+
+	Out.ar(0, {output}!2);
+}
+).play;
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+(
+SynthDef(\twelveSynth, | input
+	frequency = 200| {
+
+
+
+}
+).add;
+)
+
+~myFirst = Synth.new(\twelveSynth).register;
+
+var notes = [57, 60, 64, 69];
+
+
+
 
 
 
