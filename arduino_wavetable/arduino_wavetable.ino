@@ -91,7 +91,8 @@ void setup()
   sbi(TIMSK2,TOIE2); // Aktiverar Timer2 Interrupt
   
   // Tilldela variabel soundSampleFromADC ett samplevärde från ADCn
-  soundSampleFromADC = badc0;  
+  soundSampleFromADC = badc0; 
+    
 }
 
 
@@ -103,11 +104,18 @@ void loop()
   // Vänta på samplevärde från analog-till-digital-konverteraren
   // en samplingscykel 15625 KHz = 65 mikrosekunder 
   while (!sampleFlag) {
+
   }
 
   sampleFlag = false;  // Sätt samplingsflaggan till false för att invänta nästa sample
 
   
+    bufferIndex = (bufferIndex + badc1) % 512;
+
+    sramBufferSampleValue = sramBuffer[bufferIndex];
+    OCR2A = sramBufferSampleValue; 
+
+   // Serial.println(sramBufferSampleValue);
 
 }
 
@@ -117,9 +125,29 @@ void loop()
 // Funktion för att fylla SRAM buffern med en vågform
 void fillSramBufferWithWaveTable(){
 
-  
-  
-  
+  float soundValue = 0;
+  int _srBuff = sizeof(sramBuffer)-1;
+
+
+  // Fyrkantsvåg
+ 
+ /* for (int i = 0; i <= _srBuff; i++) {
+    if(i <= round(_srBuff/2)) {
+      soundValue = 192;
+    } else {
+      soundValue = 64;
+    }*/
+
+    // Sågtandsvåg
+    float k = 255/512;
+    for (int i = 255; i <= _srBuff; i++) {
+      soundValue += k;
+
+    sramBuffer[i] = soundValue;
+    Serial.println(k);
+    }
+
+
 }
 
 
