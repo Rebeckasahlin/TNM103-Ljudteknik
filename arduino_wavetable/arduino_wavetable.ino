@@ -131,7 +131,7 @@ void fillSramBufferWithWaveTable(){
 
   // Fyrkantsvåg
  
- /* for (int i = 0; i <= _srBuff; i++) {
+  /*for (int i = 0; i <= _srBuff; i++) {
     if(i <= round(_srBuff/2)) {
       soundValue = 192;
     } else {
@@ -141,10 +141,16 @@ void fillSramBufferWithWaveTable(){
     // Sågtandsvåg
     float k = 255/512;
     for (int i = 255; i <= _srBuff; i++) {
-      soundValue += k;
+      if(i % 2 == 0) {
+        soundValue += 1;
+      } else {
+        soundValue += k;
+      }
+      
+      
 
     sramBuffer[i] = soundValue;
-    Serial.println(k);
+   // Serial.println(k);
     }
 
 
