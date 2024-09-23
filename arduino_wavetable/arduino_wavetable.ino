@@ -115,7 +115,11 @@ void loop()
     sramBufferSampleValue = sramBuffer[bufferIndex];
     OCR2A = sramBufferSampleValue; 
 
-   // Serial.println(sramBufferSampleValue);
+  //Serial.println(sramBufferSampleValue);
+
+  Serial.println("hehj");
+ 
+   
 
 }
 
@@ -125,36 +129,93 @@ void loop()
 // Funktion för att fylla SRAM buffern med en vågform
 void fillSramBufferWithWaveTable(){
 
+
   float soundValue = 0;
   int _srBuff = sizeof(sramBuffer)-1;
 
+  float sample1[512];
+  float sample2[512];
+
 
   // Fyrkantsvåg
- 
-  /*for (int i = 0; i <= _srBuff; i++) {
+ /* for (int i = 0; i <= _srBuff; i++) {
     if(i <= round(_srBuff/2)) {
       soundValue = 192;
     } else {
       soundValue = 64;
-    }*/
-
+    }
+    sramBuffer[i] = soundValue;}*/
+    // 
+//--------------------------------------------------------
     // Sågtandsvåg
-    float k = 255/512;
-    for (int i = 255; i <= _srBuff; i++) {
+  /*  float k = 255/512;
+    for (int i = 0; i <= _srBuff; i++) {
       if(i % 2 == 0) {
         soundValue += 1;
       } else {
         soundValue += k;
       }
-      
-      
+      sramBuffer[i] = soundValue;
+      }*/
+       
+//----------------------------------------------------
+    // Triangelvåg 
+    /* float k = 0.99609375;
+     for (int i = 0; i < floor(_srBuff/2); i++){
+      soundValue = soundValue + k;
+      sramBuffer[i] = ceil(soundValue);
+     }  
+     for (int i = floor(_srBuff/2); i <= _srBuff; i++){
+      soundValue = soundValue - k;
+      sramBuffer[i] = floor(soundValue);
+     } */
+//------------------------------------------------------
+    // Sinusvåg
+   /* float delta = (2*M_PI)/_srBuff;
 
-    sramBuffer[i] = soundValue;
-   // Serial.println(k);
+    for(int i = 0; i <= _srBuff; i++){
+      float sinusSample;
+      sinusSample = 127 * sin(soundValue) + 127;
+      soundValue += delta;
+
+      sramBuffer[i] = round(sinusSample);
+    }*/
+    //------------------------------- MIX --------------------
+
+    // Sågtandsvåg
+   float k = 255/512;
+
+    for (int i = 0; i <= _srBuff; i++) {
+        if(i % 2 == 0) {
+          soundValue += 1;
+        } else {
+          soundValue += k;
+        }
+        sample1[i] = soundValue;
+      }
+        // Sinusvåg
+  /* float delta = (2*M_PI)/_srBuff;
+    soundValue = 0;
+    for(int i = 0; i <= _srBuff; i++){
+      float sinusSample;
+      sinusSample = 127 * sin(soundValue) + 127;
+      soundValue += delta;
+
+      sample2[i] = round(sinusSample);
+    }*/
+
+      for(int i = 0; i <= _srBuff; i++){
+        sramBuffer[i] = (sample1[i])/2;
+        
+      }
+       Serial.println(sizeof(sample1));
+
+    
+     
+   
+    
     }
 
-
-}
 
 
 
