@@ -106,6 +106,29 @@ void loop()
   }
 
   sampleFlag = false;  // Sätt samplingsflaggan till false för att invänta nästa sample
+  soundSampleFromADC = badc0; 
+  // bufferIndex = (bufferIndex + badc0) % 512;
+
+   // sramBufferSampleValue = sramBuffer[bufferIndex];
+   // OCR2A = soundSampleFromADC; 
+
+ // Serial.println(soundSampleFromADC);
+
+ float alphaLP;
+ float prealphaLP;
+ int filteredSound;
+
+ prealphaLP = map(badc1, 0, 255, 0, 1000);
+ alphaLP = prealphaLP/1000.0;
+
+
+ float prevSoundSampleFromADC = soundSampleFromADC;
+
+filteredSound = round((prevSoundSampleFromADC*(1-alphaLP) + soundSampleFromADC*alphaLP)/2);
+
+OCR2A = filteredSound;
+
+
 
   
 
