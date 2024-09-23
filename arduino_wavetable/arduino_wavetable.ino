@@ -115,7 +115,7 @@ void loop()
     sramBufferSampleValue = sramBuffer[bufferIndex];
     OCR2A = sramBufferSampleValue; 
 
-  //Serial.println(sramBufferSampleValue);
+  Serial.println(sramBufferSampleValue);
 
  
    
@@ -129,11 +129,11 @@ void loop()
 void fillSramBufferWithWaveTable(){
 
 
-  float soundValue = 0;
+ /* float soundValue = 0;
   int _srBuff = sizeof(sramBuffer)-1;
 
   float sample1[512];
-  float sample2[512];
+  float sample2[512];*/
 
 
   // Fyrkantsvåg
@@ -181,41 +181,53 @@ void fillSramBufferWithWaveTable(){
     }*/
     //------------------------------- MIX --------------------
 
-    // Sågtandsvåg
-   float k = 255/512;
+  /* float soundValueSaw = 0;
+   float soundValueSin = 0;
+   float k = 255.0 / 512.0;
+   float delta = (2 * M_PI) / 512;
 
-    for (int i = 0; i <= _srBuff; i++) {
-        if(i % 2 == 0) {
-          soundValue += 1;
-        } else {
-          soundValue += k;
-        }
-        sample1[i] = soundValue;
-       
-      }
-        // Sinusvåg
-        float delta = (2*M_PI)/_srBuff;
-        soundValue = 0;
-    for(int i = 0; i <= _srBuff; i++){
-
-        float sinusSample;
-        sinusSample = 127 * sin(soundValue) + 127;
-        soundValue += delta;
-
-        sample2[i] = round(sinusSample);
-    }
-
-      for(int i = 0; i <= _srBuff; i++){
-
-        sramBuffer[i] = round((sample1[i] + sample2[1])/2);
-
-      }
-
+  // ----------------- Sågtand & Sinusvåg
+   for (int i = 0; i <= 511; i++) {
     
+      if(i % 2 == 0) {
+         soundValueSaw += 1;
+      } else {
+         soundValueSaw += k;
+      }
+
+      // Sinusvåg
+      float sinusSample = 127 * sin(soundValueSin) + 127;
+      soundValueSin += delta;
+
+      sramBuffer[i] = round((soundValueSaw + sinusSample) / 2);
+      }*/
+
+  //----------------------- Triangelvåg & Fyrkantvåg
+   float soundValueFyr = 0;
+   float soundValueTri = 0;
+   float k = 255.0 / 512.0;
+   int _srBuff = sizeof(sramBuffer)-1;
+  // Fyrkant
+    for (int i = 0; i <= _srBuff; i++) {
+
+          if(i <= round(_srBuff/2)) {
+                soundValueFyr = 192;
+          } else {
+                soundValueFyr = 64;
+         }
+
+         if (i < floor(_srBuff/2)){
+            soundValueTri = soundValueTri + k;
+         } else {
+          soundValueTri = soundValueTri - k;
+         }
+
+      sramBuffer[i] = round((soundValueFyr + soundValueTri) / 2);
+    }
      
    
-    
-    }
+   
+ }
 
 
 
