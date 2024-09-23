@@ -203,7 +203,7 @@ void fillSramBufferWithWaveTable(){
       }*/
 
   //----------------------- Triangelvåg & Fyrkantvåg
-   float soundValueFyr = 0;
+ /*  float soundValueFyr = 0;
    float soundValueTri = 0;
    float k = 255.0 / 512.0;
    int _srBuff = sizeof(sramBuffer)-1;
@@ -223,7 +223,7 @@ void fillSramBufferWithWaveTable(){
          }
 
       sramBuffer[i] = round((soundValueFyr + soundValueTri) / 2);
-    }
+    }*/
      
    
    
