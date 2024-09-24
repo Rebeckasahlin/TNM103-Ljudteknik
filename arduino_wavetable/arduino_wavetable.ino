@@ -112,10 +112,15 @@ void loop()
   
     bufferIndex = (bufferIndex + badc1) % 512;
 
-    sramBufferSampleValue = sramBuffer[bufferIndex];
+    bufferIndex2 = (bufferIndex2 + (badc1 * 3)) % 512;
+
+    byte sample1 = sramBuffer[bufferIndex];
+    byte sample2 = sramBuffer[bufferIndex2];
+
+    sramBufferSampleValue = (sample1 + sample2) / 2;
     OCR2A = sramBufferSampleValue; 
 
-  Serial.println(sramBufferSampleValue);
+   // Serial.println(sramBufferSampleValue);
 
  
    
@@ -129,11 +134,11 @@ void loop()
 void fillSramBufferWithWaveTable(){
 
 
- /* float soundValue = 0;
+  float soundValue = 0;
   int _srBuff = sizeof(sramBuffer)-1;
 
   float sample1[512];
-  float sample2[512];*/
+  float sample2[512];
 
 
   // Fyrkantsvåg
@@ -170,7 +175,7 @@ void fillSramBufferWithWaveTable(){
      } */
 //------------------------------------------------------
     // Sinusvåg
-   /* float delta = (2*M_PI)/_srBuff;
+    float delta = (2*M_PI)/_srBuff;
 
     for(int i = 0; i <= _srBuff; i++){
       float sinusSample;
@@ -178,7 +183,7 @@ void fillSramBufferWithWaveTable(){
       soundValue += delta;
 
       sramBuffer[i] = round(sinusSample);
-    }*/
+    }
     //------------------------------- MIX --------------------
 
   /* float soundValueSaw = 0;
