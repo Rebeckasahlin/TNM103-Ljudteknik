@@ -96,7 +96,10 @@ void setup()
 
 
 
-
+float prevSoundSampleFromADC = 0;
+int highpasSignal = 0;
+int bandpass = 0;
+int LPfilterTillBP;
 // loop() är en funktion som körs om och om igen efter att Arduinot har startats och setup() har initierat Arduinot. Detta är huvudfunktionen och den körs så snabbt/ofta det går enligt klockfrekvensen i Arduinot. Normal klockfrekvens är 16MHz.
 void loop()
 {
@@ -107,26 +110,54 @@ void loop()
 
   sampleFlag = false;  // Sätt samplingsflaggan till false för att invänta nästa sample
   soundSampleFromADC = badc0; 
+// ----------------- Lågpassfilter
+ float alphaLP;
+ float alpha2sqrt;
+  float alpha2line;
+
+ float prealphaLP;
+ int LPfilteredSound;
+ int dcOffset = 137;
+
+ prealphaLP = map(badc1, 0.04, 255*0.75, 0, 1000);
+ alphaLP = prealphaLP/1000.0;
+
+
+LPfilteredSound = (prevSoundSampleFromADC*(1-alphaLP) + soundSampleFromADC*alphaLP)/2.0;
+prevSoundSampleFromADC = soundSampleFromADC;
+
+//OCR2A = LPfilteredSound;
+
+//------------------------- Högpassfilter
+
+soundSampleFromADC -= LPfilteredSound;
+
+highpasSignal = soundSampleFromADC + dcOffset;
+
+OCR2A = highpasSignal;
+
+//Serial.println(highpasSignal);
+
+// ------------------------- Bandpassfiler
+
+alpha2sqrt = sqrt(alphaLP);
+alpha2line = alphaLP + 0.5; // Addera och multiplicera
+
+LPfilterTillBP = (prevSoundSampleFromADC*(1-alpha2line) + soundSampleFromADC*alpha2line)/2.0;
+bandpass = LPfilterTillBP - LPfilteredSound + dcOffset;  
+
+OCR2A = bandpass;
+
+
+
+//--------------------------------------------------------------
+
   // bufferIndex = (bufferIndex + badc0) % 512;
 
    // sramBufferSampleValue = sramBuffer[bufferIndex];
    // OCR2A = soundSampleFromADC; 
 
  // Serial.println(soundSampleFromADC);
-
- float alphaLP;
- float prealphaLP;
- int filteredSound;
-
- prealphaLP = map(badc1, 0, 255, 0, 1000);
- alphaLP = prealphaLP/1000.0;
-
-
- float prevSoundSampleFromADC = soundSampleFromADC;
-
-filteredSound = round((prevSoundSampleFromADC*(1-alphaLP) + soundSampleFromADC*alphaLP)/2);
-
-OCR2A = filteredSound;
 
 
 
