@@ -33,6 +33,8 @@ volatile byte badc0; // Det samplade ljudvärdet, byte AD-konverterare kanal 0
 volatile byte badc1; // Det samplade potentiometervärdet, kanal 1
 volatile byte ibb; // Global interruptvariabel
 
+volatile byte badc3;
+
 int bufferIndex; // Index i SRAM buffer
 int bufferIndex2; // Alternativ index
 
@@ -113,7 +115,7 @@ void loop()
 // ----------------- Lågpassfilter
  float alphaLP;
  float alpha2sqrt;
-  float alpha2line;
+ float alpha2line;
 
  float prealphaLP;
  int LPfilteredSound;
@@ -124,7 +126,7 @@ void loop()
 
 
 LPfilteredSound = (prevSoundSampleFromADC*(1-alphaLP) + soundSampleFromADC*alphaLP)/2.0;
-prevSoundSampleFromADC = soundSampleFromADC;
+
 
 //OCR2A = LPfilteredSound;
 
@@ -141,14 +143,21 @@ OCR2A = highpasSignal;
 // ------------------------- Bandpassfiler
 
 alpha2sqrt = sqrt(alphaLP);
-alpha2line = alphaLP + 0.5; // Addera och multiplicera
+//alpha2line = alphaLP + 0.5; // Addera och multiplicera
 
-LPfilterTillBP = (prevSoundSampleFromADC*(1-alpha2line) + soundSampleFromADC*alpha2line)/2.0;
+LPfilterTillBP = (prevSoundSampleFromADC*(1-alpha2sqrt) + soundSampleFromADC*alpha2sqrt)/2.0;
 bandpass = LPfilterTillBP - LPfilteredSound + dcOffset;  
 
-OCR2A = bandpass;
 
+//OCR2A = bandpass;
 
+// ------------------------ Bandstoppfilter
+int bandstopp;
+bandstopp = soundSampleFromADC - bandpass + dcOffset;
+
+prevSoundSampleFromADC = soundSampleFromADC;
+
+//OCR2A = bandstopp;
 
 //--------------------------------------------------------------
 
