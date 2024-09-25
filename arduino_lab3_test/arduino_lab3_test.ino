@@ -107,10 +107,13 @@ void loop()
 {
   // Vänta på samplevärde från analog-till-digital-konverteraren
   // en samplingscykel 15625 KHz = 65 mikrosekunder 
-  while (!sampleFlag) {
+ /* while (!sampleFlag) {
   }
 
-  sampleFlag = false;  // Sätt samplingsflaggan till false för att invänta nästa sample
+  sampleFlag = false;  // Sätt samplingsflaggan till false för att invänta nästa sample*/
+
+
+
   soundSampleFromADC = badc0; 
 // ----------------- Lågpassfilter
  float alphaLP;
