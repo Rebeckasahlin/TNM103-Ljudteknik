@@ -107,14 +107,17 @@ void loop()
 {
   // Vänta på samplevärde från analog-till-digital-konverteraren
   // en samplingscykel 15625 KHz = 65 mikrosekunder 
- /* while (!sampleFlag) {
+  while (!sampleFlag) {
   }
 
-  sampleFlag = false;  // Sätt samplingsflaggan till false för att invänta nästa sample*/
+  sampleFlag = false;  // Sätt samplingsflaggan till false för att invänta nästa sample
 
+   bufferIndex = (bufferIndex + badc0) % 512;
 
+   sramBufferSampleValue = sramBuffer[bufferIndex];
+  // OCR2A = soundSampleFromADC; 
 
-  soundSampleFromADC = badc0; 
+  soundSampleFromADC = sramBufferSampleValue; 
 // ----------------- Lågpassfilter
  float alphaLP;
  float alpha2sqrt;
@@ -124,7 +127,7 @@ void loop()
  int LPfilteredSound;
  int dcOffset = 137;
 
- prealphaLP = map(badc1, 0.04, 255*0.75, 0, 1000);
+ prealphaLP = map(50, 0.04, 255*0.75, 0, 1000);
  alphaLP = prealphaLP/1000.0;
 
 
@@ -137,19 +140,20 @@ LPfilteredSound = (prevSoundSampleFromADC*(1-alphaLP) + soundSampleFromADC*alpha
 
 //soundSampleFromADC -= LPfilteredSound; 
 
-highpasSignal = soundSampleFromADC + dcOffset;
+//highpasSignal = soundSampleFromADC + dcOffset;
 
-OCR2A = highpasSignal;
+//OCR2A = highpasSignal;
 
 //Serial.println(highpasSignal);
 
 // ------------------------- Bandpassfiler
 
 alpha2sqrt = sqrt(alphaLP);
-//alpha2line = alphaLP + 0.5; // Addera och multiplicera
+
 
 LPfilterTillBP = (prevSoundSampleFromADC*(1-alpha2sqrt) + soundSampleFromADC*alpha2sqrt)/2.0;
 bandpass = LPfilterTillBP - LPfilteredSound + dcOffset;  
+//prevSoundSampleFromADC = soundSampleFromADC;
 
 
 //OCR2A = bandpass;
@@ -160,7 +164,7 @@ bandstopp = soundSampleFromADC - bandpass + dcOffset;
 
 prevSoundSampleFromADC = soundSampleFromADC;
 
-//OCR2A = bandstopp;
+OCR2A = bandstopp;
 
 //--------------------------------------------------------------
 
@@ -188,17 +192,17 @@ void fillSramBufferWithWaveTable(){
 
 
   // Fyrkantsvåg
- /* for (int i = 0; i <= _srBuff; i++) {
+  for (int i = 0; i <= _srBuff; i++) {
     if(i <= round(_srBuff/2)) {
       soundValue = 192;
     } else {
       soundValue = 64;
     }
-    sramBuffer[i] = soundValue;}*/
+    sramBuffer[i] = soundValue;}
     // 
 //--------------------------------------------------------
     // Sågtandsvåg
-  /*  float k = 255/512;
+    /*float k = 255/512;
     for (int i = 0; i <= _srBuff; i++) {
       if(i % 2 == 0) {
         soundValue += 1;
@@ -221,7 +225,7 @@ void fillSramBufferWithWaveTable(){
      } */
 //------------------------------------------------------
     // Sinusvåg
-    float delta = (2*M_PI)/_srBuff;
+   /* float delta = (2*M_PI)/_srBuff;
 
     for(int i = 0; i <= _srBuff; i++){
       float sinusSample;
@@ -229,7 +233,7 @@ void fillSramBufferWithWaveTable(){
       soundValue += delta;
 
       sramBuffer[i] = round(sinusSample);
-    }
+    }*/
     //------------------------------- MIX --------------------
 
   /* float soundValueSaw = 0;
