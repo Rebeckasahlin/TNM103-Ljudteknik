@@ -203,14 +203,6 @@ SynthDef(\elevenSynth, {
 
 
 
-
-
-
-
-
-
-
-
 (
 SynthDef(\twelveSynth, | input
 	frequency = 200| {
@@ -223,8 +215,75 @@ SynthDef(\twelveSynth, | input
 
 ~myFirst = Synth.new(\twelveSynth).register;
 
-var notes = [57, 60, 64, 69];
 
+
+
+// LAB 4
+(
+SynthDef(\firstLab4, { | gate = 0, inputFreq = 440 |
+
+	//var trigger = LFPulse.kr(1, 0, 0.5, 1, 0);
+	var envelope = EnvGen.kr(Env.adsr(0.1, 0.3, 1.0, 1, -4.0), gate);
+	var signal =  SinOsc.ar(inputFreq.midicps, 0, 0.1);
+
+
+	var output = envelope * signal;
+
+	Out.ar(0, {output}!2);
+}
+).add;
+)
+
+
+
+
+(
+SynthDef(\firstSynth, { | inputFreq = 440 |
+	var fas = 0.5;
+	var output = SinOsc.ar(inputFreq.midicps, fas); // Använd inputFreq för att ändra frekvens
+	Out.ar(0, [output, output]);
+}).add;
+)
+
+~myfirstSynth = Synth.new(\firstLab4).register;
+
+
+{
+	var notes = [57, 60, 64, 69];
+	loop {
+		notes.do { |note|
+			~myfirstSynth.set(\inputFreq, note); // Sätt tonen från listan
+			~myfirstSynth.set(\gate, 1);
+			0.5.wait;
+			~myfirstSynth.set(\gate, 0);
+			0.5.wait;
+			~myfirstSynth.set(\gate, 1);
+		};
+	};
+}.fork;
+
+
+(
+SynthDef(\noiseSynth, {| inputFreq = 640 |
+	var noise = PinkNoise.ar(1, 0);
+	// ------------------LowPass and HighPass
+	//var low = LPF.ar(noise, inputFreq, 1, 0);
+	//var high = HPF.ar(noise, inputFreq, 1, 0);
+
+	// --------------- LFO
+	//var lfo = SinOsc.kr(50, 0, 1, 0) * 100;
+	//var lowLFO = LPF.ar(noise, inputFreq + lfo, 1, 0);
+
+	// ------------Resonans
+	var resonans = RLPF.ar(noise, inputFreq, 0.1, 1, 0);
+
+	var output = resonans;
+	FreqScope(400, 200, 0, server: s);
+
+
+	Out.ar(0, {output}!2);
+}).play;
+)
 
 
 
