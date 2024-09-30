@@ -264,7 +264,7 @@ SynthDef(\firstSynth, { | inputFreq = 440 |
 
 
 (
-SynthDef(\noiseSynth, {| inputFreq = 640 |
+SynthDef(\noiseSynth, {| inputFreq = 440.00 |
 	var noise = PinkNoise.ar(1, 0);
 	// ------------------LowPass and HighPass
 	//var low = LPF.ar(noise, inputFreq, 1, 0);
@@ -275,24 +275,57 @@ SynthDef(\noiseSynth, {| inputFreq = 640 |
 	//var lowLFO = LPF.ar(noise, inputFreq + lfo, 1, 0);
 
 	// ------------Resonans
-	var resonans = RLPF.ar(noise, inputFreq, 0.1, 1, 0);
+	//var resonans = RLPF.ar(noise, inputFreq, 0.5, 1, 0);
 
-	var output = resonans;
+	// ------------ Bandpassfilter
+	//var bandpass = BPF.ar(noise, inputFreq, 0.1, 1, 0);
+
+	// --------------------- Bandstoppfilter
+	//var sin = SinOsc.ar(1, 0, 1, 0).range(400, 800);
+	//var bandstopp = BBandStop.ar(noise, inputFreq + sin, 0.5, 1, 0);
+
+	// ----------------- Andra vs fjärde
+	//var output = noise;
+	//var filteredOutput = BLowPass4.ar(output, 400, 0.1);
+
+	// -------- Självsvängning
+	var mic = SoundIn.ar(1, 1, 0);
+	var output = noise*0.04;
+	var high = HPF.ar(mic, inputFreq, 1, 0)*2;
+	var filteredOutput = BLowPass4.ar(mic, inputFreq.midicps, 0.5)*5;
+
+	// --------------- Mikrofon
+
+
+
+
 	FreqScope(400, 200, 0, server: s);
 
 
-	Out.ar(0, {output}!2);
+	Out.ar(0, {filteredOutput}!2);
 }).play;
 )
 
+~mynoiseSynth = Synth.new(\noiseSynth).register;
+
+
+{
+	var notes = [57, 60, 64, 69];
+	loop {
+		notes.do { |note|
+			~mynoiseSynth.set(\inputFreq, note); // Sätt tonen från listan
+			1.0.wait;
+		};
+	};
+}.fork;
 
 
 
 
+ServerOptions.inDevices.postln;
 
-
-
-
+var realtekR = "Microphone Array (Realtek(R) Au";
+s.meter;
 
 
 
