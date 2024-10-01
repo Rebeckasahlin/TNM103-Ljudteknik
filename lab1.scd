@@ -218,32 +218,31 @@ SynthDef(\twelveSynth, | input
 
 
 
-// LAB 4
-(
-SynthDef(\firstLab4, { | gate = 0, inputFreq = 440 |
+// LAB 4-------------------------------------------------------------------------------------------------
+(SynthDef(\firstLab4, { | gate = 0, inputFreq = 440, bufnum = 0, delayTimes = #[0.1, 0.3, 0.5] |
 
 	//var trigger = LFPulse.kr(1, 0, 0.5, 1, 0);
-	var envelope = EnvGen.kr(Env.adsr(0.1, 0.3, 1.0, 1, -4.0), gate);
+	var envelope = EnvGen.kr(Env.adsr(0.8, 0.3, 1.0, 1, -4.0), gate);
 	var signal =  SinOsc.ar(inputFreq.midicps, 0, 0.1);
 
+	var audioFile = PlayBuf.ar(2, bufnum);
 
-	var output = envelope * signal;
+	var slump = [Rand.new(0.0, 1.0), Rand.new(0.0, 1.0), Rand.new(0.0, 1.0)];
+
+	var delay = signal;
+
+	delayTime.do { |delayTime, slump|
+		delay = AllpassC.ar(delay, delayTime, delayTime, slump, 1.0, 0.0);
+	};
+
+
+	var output = envelope * delay;
 
 	Out.ar(0, {output}!2);
 }
 ).add;
 )
 
-
-
-
-(
-SynthDef(\firstSynth, { | inputFreq = 440 |
-	var fas = 0.5;
-	var output = SinOsc.ar(inputFreq.midicps, fas); // Använd inputFreq för att ändra frekvens
-	Out.ar(0, [output, output]);
-}).add;
-)
 
 ~myfirstSynth = Synth.new(\firstLab4).register;
 
@@ -254,9 +253,9 @@ SynthDef(\firstSynth, { | inputFreq = 440 |
 		notes.do { |note|
 			~myfirstSynth.set(\inputFreq, note); // Sätt tonen från listan
 			~myfirstSynth.set(\gate, 1);
-			0.5.wait;
+			1.5.wait;
 			~myfirstSynth.set(\gate, 0);
-			0.5.wait;
+			1.5.wait;
 			~myfirstSynth.set(\gate, 1);
 		};
 	};
@@ -264,7 +263,7 @@ SynthDef(\firstSynth, { | inputFreq = 440 |
 
 
 (
-SynthDef(\noiseSynth, {| inputFreq = 440.00 |
+SynthDef(\noiseSynth, {| inputFreq = 400.00, bufnum = 0 |
 	var noise = PinkNoise.ar(1, 0);
 	// ------------------LowPass and HighPass
 	//var low = LPF.ar(noise, inputFreq, 1, 0);
@@ -289,21 +288,26 @@ SynthDef(\noiseSynth, {| inputFreq = 440.00 |
 	//var filteredOutput = BLowPass4.ar(output, 400, 0.1);
 
 	// -------- Självsvängning
-	var mic = SoundIn.ar(1, 1, 0);
-	var output = noise*0.04;
-	var high = HPF.ar(mic, inputFreq, 1, 0)*2;
-	var filteredOutput = BLowPass4.ar(mic, inputFreq.midicps, 0.5)*5;
+	//var mic = SoundIn.ar(1, 1, 0);
+	//var output = noise*0.04;
+	//var high = HPF.ar(mic, inputFreq, 1, 0)*2;
+	//var filteredOutput = BLowPass4.ar(mic, inputFreq.midicps, 0.5)*5;
 
-	// --------------- Mikrofon
+	// --------------- Egen musik
+	//var audioFile = PlayBuf.ar(2, bufnum);
+
+	//var high = HPF.ar(audioFile, inputFreq, 1, 0);
+
+	//------------- Eko delay
+	var sin = SinOsc.ar(inputFreq.midicps);
+	var delay = AllpassC.ar(sin * 0.5, 0.2, 0.2, 1.0, 1.0, 0.0);
 
 
+	//FreqScope(400, 200, 0, server: s);
 
 
-	FreqScope(400, 200, 0, server: s);
-
-
-	Out.ar(0, {filteredOutput}!2);
-}).play;
+	Out.ar(0, {delay}!2);
+}).add;
 )
 
 ~mynoiseSynth = Synth.new(\noiseSynth).register;
@@ -326,6 +330,19 @@ ServerOptions.inDevices.postln;
 
 var realtekR = "Microphone Array (Realtek(R) Au";
 s.meter;
+
+// ---------- Birds
+fork({
+	var soundFileBuffer = Buffer.read(s, "/Users/Rebecka/Documents/Liu/Kurser/Ljudteknik/TNM103-Ljudteknik/bird_bees.wav");
+	1.0.wait;
+//	~mynoiseSynth.set(\bufnum, soundFileBuffer.bufnum);
+	~myfirstSynth.set(\gate, 1);
+	~myfirstSynth.set(\bufnum, soundFileBuffer.bufnum);
+	10.0.wait;
+	~myfirstSynth.set(\gate, 0);
+
+});
+
 
 
 
