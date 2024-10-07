@@ -1,10 +1,10 @@
-function [reverbedSound] = schroederAllpass(signalForReverb, reverbLength, reverbGain, Fs)
+function [reverbedSound] = schroederAllpass(signalForReverb, reverbLength, reverbGain)
 
-b = zeroes(1, reverbLength + 1);
+b = zeros(1, reverbLength + 1);
 b(1) = -reverbGain;
 b(reverbLength + 1) = 1;
 
-a = zeroes(1, reverbLength + 1);
+a = zeros(1, reverbLength + 1);
 a(1) = 1;
 a(reverbLength + 1) = -reverbGain;
 
