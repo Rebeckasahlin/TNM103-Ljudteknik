@@ -97,7 +97,8 @@ void setup()
 
 
 
-// loop() är en funktion som körs om och om igen efter att Arduinot har startats och setup() har initierat Arduinot. Detta är huvudfunktionen och den körs så snabbt/ofta det går enligt klockfrekvensen i Arduinot. Normal klockfrekvens är 16MHz.
+// loop() är en funktion som körs om och om igen efter att Arduinot har startats och setup() har initierat Arduinot. 
+//Detta är huvudfunktionen och den körs så snabbt/ofta det går enligt klockfrekvensen i Arduinot. Normal klockfrekvens är 16MHz.
 void loop()
 {
   // Vänta på samplevärde från analog-till-digital-konverteraren
