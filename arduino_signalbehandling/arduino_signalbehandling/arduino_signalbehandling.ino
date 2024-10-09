@@ -108,8 +108,29 @@ void loop()
 
   sampleFlag = false;  // Sätt samplingsflaggan till false för att invänta nästa sample
 
-  
+ // sramBufferSampleValue; // Samplecontainer
+  int dcOffset = 137;
+  soundSampleFromADC = badc0; 
 
+  float overdrive = soundSampleFromADC * badc1 * 0.25;
+
+  if (overdrive <= 1) {
+      overdrive = 1;
+  }
+
+  overdrive = overdrive - dcOffset;
+  float max = 254/2;
+  float min = -dcOffset;
+
+  if (overdrive > max) {
+      overdrive = max;
+  }
+  if (overdrive < min) {
+    overdrive = min;
+  }
+
+  sramBufferSampleValue = overdrive + dcOffset;
+  OCR2A = sramBufferSampleValue; 
 }
 
 
