@@ -127,6 +127,23 @@ void loop()
 
    soundSampleFromSramBuffer = soundSampleFromADC + soundSampleFromSramBuffer;
 
+  int max = 128;
+  int min = -dcOffset;
+
+  if (soundSampleFromSramBuffer > max) {
+      soundSampleFromSramBuffer = max;
+  }
+ 
+  if (soundSampleFromSramBuffer < min) {
+    soundSampleFromSramBuffer = min;
+  }
+
+  soundSampleFromSramBuffer = soundSampleFromSramBuffer + dcOffset;
+
+  sramBuffer[bufferIndex] = soundSampleFromSramBuffer;
+
+  OCR2A = soundSampleFromSramBuffer;
+
 
 }
 
