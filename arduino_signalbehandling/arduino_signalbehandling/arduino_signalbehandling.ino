@@ -112,12 +112,16 @@ void loop()
   int dcOffset = 137;
   soundSampleFromADC = badc0; 
 
+  if (badc1 <= 10) {
+      badc1 = 10;
+  }
+
   float overdrive = soundSampleFromADC * badc1 * 0.25;
 
   if (overdrive <= 1) {
       overdrive = 1;
   }
-
+ 
   overdrive = overdrive - dcOffset;
   float max = 254/2;
   float min = -dcOffset;
@@ -125,10 +129,11 @@ void loop()
   if (overdrive > max) {
       overdrive = max;
   }
+ 
   if (overdrive < min) {
     overdrive = min;
   }
-
+ // OCR2A = overdrive;
   sramBufferSampleValue = overdrive + dcOffset;
   OCR2A = sramBufferSampleValue; 
 }
