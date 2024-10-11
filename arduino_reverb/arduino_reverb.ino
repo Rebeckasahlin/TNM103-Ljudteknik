@@ -109,25 +109,23 @@ void loop()
   sampleFlag = false;  // Sätt samplingsflaggan till false för att invänta nästa sample
 
   int dcOffset = 127;
-  int value = 255;
 
-  soundSampleFromADC = badc0 - dcOffset; 
+   bufferIndex = (bufferIndex) % 512;
 
-   bufferIndex = (bufferIndex + badc1 / 2) % 512;
+   soundSampleFromSramBuffer = sramBuffer[bufferIndex];
 
-   sramBufferSampleValue = sramBuffer[bufferIndex];
+   soundSampleFromSramBuffer = soundSampleFromSramBuffer - dcOffset;
 
-   sramBufferSampleValue = sramBufferSampleValue - dcOffset;
+   soundSampleFromSramBuffer = -soundSampleFromSramBuffer;
 
-   //sramBufferSampleValue = sample1;
-   
-   sramBufferSampleValue = (soundSampleFromADC * 2 * sramBufferSampleValue) / 256;
+   int pottan = map(badc1, 0.0, 255, 0, 245);
+   soundSampleFromSramBuffer = soundSampleFromSramBuffer * pottan;
 
-   sramBufferSampleValue = sramBufferSampleValue + dcOffset;
-   
-   OCR2A = sramBufferSampleValue; 
+   soundSampleFromSramBuffer = soundSampleFromSramBuffer / 256;
 
+   soundSampleFromADC = badc0 - dcOffset; 
 
+   soundSampleFromSramBuffer = soundSampleFromADC + soundSampleFromSramBuffer;
 
 
 }
@@ -138,31 +136,6 @@ void loop()
 // Funktion för att fylla SRAM buffern med en vågform
 void fillSramBufferWithWaveTable(){
 
-
-  float soundValue = 0;
-  int _srBuff = sizeof(sramBuffer)-1;
-
-  float sample1[512];
-  float sample2[512];
-
-       
-//------------------------------------------------------
-    // Sinusvåg
-    float delta = (2*M_PI)/_srBuff;
-
-    for(int i = 0; i <= _srBuff; i++){
-      float sinusSample;
-      sinusSample = 127 * sin(soundValue) + 127;
-      soundValue += delta;
-
-      sramBuffer[i] = round(sinusSample);
-    }
- 
-
-
-
-
-     
    
    
  }
